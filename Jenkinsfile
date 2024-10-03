@@ -35,20 +35,18 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        tage('Deploy to AWS Ubuntu Server') {
             steps {
-                echo 'Deploying application...'
-                sh 'scp -r ./ your-server-user@your-server-ip:/path/to/deploy'
-            }
-        }
-    }
+                echo 'Deploying application to AWS Ubuntu server...'
+                
+                // Ensure that Jenkins can SSH into your AWS Ubuntu instance.
+                // This will copy your application to the /var/www/myapp directory on your AWS Ubuntu server.
+                // Replace "ubuntu" with the correct username, typically "ubuntu" for AWS EC2 Ubuntu AMIs.
 
-    post {
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
-}
+                sh '''
+                scp -o StrictHostKeyChecking=no -r ./ ubuntu@18.209.106.29:/var/www/myapp
+                ssh ubuntu@18.209.106.29 'pm2 restart myapp || pm2 start /var/www/myapp/index.js --name myapp'
+                '''
+            }
+        }
+    }
